@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -23,6 +24,13 @@ const UserSchema = new mongoose.Schema({
     minLength: 6,
   },
 });
+
+UserSchema.methods.createJWT = function () {
+  const token = jwt.sign({ userID: this._id, name: this.name }, "mySecret", {
+    expiresIn: "30d",
+  });
+  return token;
+};
 
 //use function keyword, becasue this refers to document.
 //next usage is nt necessary-read DOCS
