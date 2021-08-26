@@ -9,16 +9,17 @@ const connectDB = require("./db/db.connect");
 const authRouter = require("./routes/auth.router");
 const jobsRouter = require("./routes/jobs.router");
 
-// error handler
+// middlewares
 const notFoundMiddleware = require("./middlewares/not-found.middleware");
 const errorHandlerMiddleware = require("./middlewares/error-handler.middleware");
+const authMiddleware = require("./middlewares/auth.middleware");
 
 app.use(express.json());
 // extra packages
 
 // routes
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/jobs", jobsRouter);
+app.use("/api/v1/jobs", authMiddleware, jobsRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
