@@ -26,14 +26,22 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.methods.createJWT = function () {
-  const token = jwt.sign({ userID: this._id, name: this.name }, "mySecret", {
-    expiresIn: "30d",
-  });
+  const token = jwt.sign(
+    { userID: this._id, name: this.name },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_LIFETIME,
+    }
+  );
   return token;
 };
 
+UserSchema.methods.comparePassword = async function (candidatePassword) {
+  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  return isMatch;
+};
 //use function keyword, becasue this refers to document.
-//next usage is nt necessary-read DOCS
+//next usage is not necessary-read DOCS
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
