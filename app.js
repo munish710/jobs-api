@@ -1,6 +1,10 @@
 require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
+const xss = require("xss-clean");
+const rateLimiter = require("express-rate-limit");
 const app = express();
 //connectDB
 const connectDB = require("./db/db.connect");
@@ -15,7 +19,10 @@ const errorHandlerMiddleware = require("./middlewares/error-handler.middleware")
 const authMiddleware = require("./middlewares/auth.middleware");
 
 app.use(express.json());
-// extra packages
+app.use(helmet());
+app.use(cors());
+app.use(xss());
+app.use(rateLimiter({ windowMs: 60 * 1000, max: 60 }));
 
 // routes
 app.use("/api/v1/auth", authRouter);
